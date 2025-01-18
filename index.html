@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shafiy Bookstore System</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 15px;
+            margin-right: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: white;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        th, td {
+            text-align: left;
+            padding: 10px;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Shafiy Bookstore System</h1>
+    <h2>Manage Your Book Inventory</h2>
+
+    <div class="form-group">
+        <label for="bookID">Book ID (e.g., T001):</label>
+        <input type="text" id="bookID" placeholder="Enter Book ID">
+    </div>
+    <div class="form-group">
+        <label for="bookName">Book Name:</label>
+        <input type="text" id="bookName" placeholder="Enter Book Name">
+    </div>
+    <div class="form-group">
+        <label for="bookBrand">Book Brand:</label>
+        <input type="text" id="bookBrand" placeholder="Enter Book Brand">
+    </div>
+    <div class="form-group">
+        <label for="bookQuantity">Quantity Available:</label>
+        <input type="number" id="bookQuantity" placeholder="Enter Quantity">
+    </div>
+    <button onclick="addNewBook()">Add New Book</button>
+    <button onclick="displayAllBooks()">Display All Books</button>
+
+    <h2>Search or Borrow a Book</h2>
+    <div class="form-group">
+        <label for="searchID">Book ID:</label>
+        <input type="text" id="searchID" placeholder="Enter Book ID">
+    </div>
+    <button onclick="searchBook()">Search Book</button>
+    <button onclick="borrowBook()">Borrow Book</button>
+
+    <table id="bookTable">
+        <thead>
+            <tr>
+                <th>Book ID</th>
+                <th>Name</th>
+                <th>Brand</th>
+                <th>Quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Book rows will appear here -->
+        </tbody>
+    </table>
+</div>
+
+<script>
+    const books = [];
+
+    function addNewBook() {
+        const bookID = document.getElementById('bookID').value.trim();
+        const bookName = document.getElementById('bookName').value.trim();
+        const bookBrand = document.getElementById('bookBrand').value.trim();
+        const bookQuantity = parseInt(document.getElementById('bookQuantity').value);
+
+        if (!bookID || !/^T\d{3}$/.test(bookID)) {
+            alert('Invalid Book ID! Format must be T001, T002, etc.');
+            return;
+        }
+        if (books.some(book => book.id === bookID)) {
+            alert('Error: Book ID already exists!');
+            return;
+        }
+        if (!bookName || !bookBrand || isNaN(bookQuantity) || bookQuantity <= 0) {
+            alert('Invalid input! Please check your data.');
+            return;
+        }
+
+        books.push({ id: bookID, name: bookName, brand: bookBrand, quantity: bookQuantity });
+        alert('Book added successfully!');
+        clearInputs();
+    }
+
+    function displayAllBooks() {
+        const tbody = document.getElementById('bookTable').querySelector('tbody');
+        tbody.innerHTML = '';
+
+        if (books.length === 0) {
+            alert('No books available.');
+            return;
+        }
+
+        books.forEach(book => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${book.id}</td>
+                <td>${book.name}</td>
+                <td>${book.brand}</td>
+                <td>${book.quantity}</td>
+            `;
+            tbody.appendChild(row);
+        });
+    }
+
+    function searchBook() {
+        const searchID = document.getElementById('searchID').value.trim();
+        const book = books.find(b => b.id === searchID);
+
+        if (book) {
+            alert(`Book found!\nID: ${book.id}, Name: ${book.name}, Brand: ${book.brand}, Quantity: ${book.quantity}`);
+        } else {
+            alert('Book not found!');
+        }
+    }
+
+    function borrowBook() {
+        const searchID = document.getElementById('searchID').value.trim();
+        const book = books.find(b => b.id === searchID);
+
+        if (!book) {
+            alert('Book not found!');
+            return;
+        }
+
+        const quantityToBorrow = parseInt(prompt('Enter quantity to borrow:'));
+        if (isNaN(quantityToBorrow) || quantityToBorrow <= 0 || quantityToBorrow > book.quantity) {
+            alert('Invalid quantity or insufficient stock!');
+            return;
+        }
+
+        book.quantity -= quantityToBorrow;
+        alert('Book borrowed successfully!');
+        displayAllBooks();
+    }
+
+    function clearInputs() {
+        document.getElementById('bookID').value = '';
+        document.getElementById('bookName').value = '';
+        document.getElementById('bookBrand').value = '';
+        document.getElementById('bookQuantity').value = '';
+    }
+</script>
+
+</body>
+</html>
